@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        folder: [rust-server-vs-goserver]
         app: [go-server, rust-server]
     permissions:
       contents: read
@@ -36,6 +37,6 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: rust-server-vs-goserver/${{ matrix.app }}
+          context: ${{ matrix.folder }}/${{ matrix.app }}
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.app }}:latest
