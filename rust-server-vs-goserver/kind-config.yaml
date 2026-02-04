@@ -1,0 +1,93 @@
+# Kind cluster configuration for Go vs Rust benchmark
+# 
+# Node pools:
+# - 1 control-plane node
+# - 2 app-pool nodes (for Go and Rust servers)
+# - 1 monitoring-pool node (for Prometheus/Grafana)
+# - 2 client-pool nodes (for k6 load testing)
+
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: go-vs-rust
+nodes:
+  # Control plane
+  - role: control-plane
+    kubeadmConfigPatches:
+      - |
+        kind: InitConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "ingress-ready=true"
+    extraPortMappings:
+      - containerPort: 80
+        hostPort: 80
+        protocol: TCP
+      - containerPort: 443
+        hostPort: 443
+        protocol: TCP
+      - containerPort: 30000
+        hostPort: 30000
+        protocol: TCP
+
+  # App pool - Node 1 (for Go server)
+  - role: worker
+    labels:
+      pool: app-pool
+    kubeadmConfigPatches:
+      - |
+        kind: JoinConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "pool=app-pool"
+
+  # App pool - Node 2 (for Rust server)
+  - role: worker
+    labels:
+      pool: app-pool
+    kubeadmConfigPatches:
+      - |
+        kind: JoinConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "pool=app-pool"
+
+  # Monitoring pool - Node 1 (for Prometheus, Grafana)
+  - role: worker
+    labels:
+      pool: monitoring-pool
+    kubeadmConfigPatches:
+      - |
+        kind: JoinConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "pool=monitoring-pool"
+
+  # Client pool - Node 1 (for k6 test runners)
+  - role: worker
+    labels:
+      pool: client-pool
+    kubeadmConfigPatches:
+      - |
+        kind: JoinConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "pool=client-pool"
+
+  # Client pool - Node 2 (for k6 test runners)
+  - role: worker
+    labels:
+      pool: client-pool
+    kubeadmConfigPatches:
+      - |
+        kind: JoinConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "pool=client-pool"
+
+networking:
+  # Disable default CNI to use a custom one if needed
+  disableDefaultCNI: false
+  # Pod subnet
+  podSubnet: "10.244.0.0/16"
+  # Service subnet  
+  serviceSubnet: "10.96.0.0/12"

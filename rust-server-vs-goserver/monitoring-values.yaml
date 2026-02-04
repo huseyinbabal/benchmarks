@@ -1,0 +1,35 @@
+# Monitoring values for Kind cluster
+# All monitoring components run on the monitoring-pool node
+
+prometheusOperator:
+  nodeSelector:
+    pool: monitoring-pool
+
+prometheus:
+  prometheusSpec:
+    enableRemoteWriteReceiver: true
+    nodeSelector:
+      pool: monitoring-pool
+
+alertmanager:
+  alertmanagerSpec:
+    nodeSelector:
+      pool: monitoring-pool
+
+grafana:
+  nodeSelector:
+    pool: monitoring-pool
+  # Import custom dashboard from ConfigMap
+  sidecar:
+    dashboards:
+      enabled: true
+      searchNamespace: ALL
+
+kubeStateMetrics:
+  nodeSelector:
+    pool: monitoring-pool
+
+nodeExporter:
+  # Node exporter needs to run on all nodes to collect metrics
+  tolerations:
+    - operator: Exists

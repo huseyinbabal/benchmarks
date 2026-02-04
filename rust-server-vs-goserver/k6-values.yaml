@@ -1,0 +1,14 @@
+# k6-operator values for Kind cluster
+# The operator runs on the monitoring-pool node
+nodeSelector:
+  pool: monitoring-pool
+
+# Resource limits for the operator manager container
+manager:
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi

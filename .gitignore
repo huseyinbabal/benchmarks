@@ -1,0 +1,30 @@
+# Build artifacts
+rust-server/target/
+go-server/go-server
+
+# Kubernetes credentials
+kubeconfig
+*.kubeconfig
+
+# Environment files
+.env
+.env.*
+*.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp

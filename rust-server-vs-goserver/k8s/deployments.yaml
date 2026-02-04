@@ -1,0 +1,106 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hash-go
+  namespace: go-server-vs-rust-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hash-go
+  template:
+    metadata:
+      labels:
+        app: hash-go
+    spec:
+      nodeSelector:
+        pool: app-pool
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - hash-rust
+            topologyKey: "kubernetes.io/hostname"
+      containers:
+      - name: hash-go
+        image: ghcr.io/huseyinbabal/benchmarks/go-server:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "64Mi"
+          limits:
+            cpu: "2"
+            memory: "3Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hash-go
+  namespace: go-server-vs-rust-server
+spec:
+  selector:
+    app: hash-go
+  ports:
+  - port: 8080
+    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hash-rust
+  namespace: go-server-vs-rust-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hash-rust
+  template:
+    metadata:
+      labels:
+        app: hash-rust
+    spec:
+      nodeSelector:
+        pool: app-pool
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - hash-go
+            topologyKey: "kubernetes.io/hostname"
+      containers:
+      - name: hash-rust
+        image: ghcr.io/huseyinbabal/benchmarks/rust-server:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "64Mi"
+          limits:
+            cpu: "2"
+            memory: "3Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hash-rust
+  namespace: go-server-vs-rust-server
+spec:
+  selector:
+    app: hash-rust
+  ports:
+  - port: 8080
+    targetPort: 8080

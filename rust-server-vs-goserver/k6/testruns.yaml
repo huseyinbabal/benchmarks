@@ -1,0 +1,62 @@
+---
+apiVersion: k6.io/v1alpha1
+kind: TestRun
+metadata:
+  name: k6-hash-go
+  namespace: go-server-vs-rust-server
+  labels:
+    target: hash-go
+spec:
+  parallelism: 1
+  paused: "false"
+  quiet: "false"
+  script:
+    configMap:
+      name: k6-test-hash-go
+      file: test.js
+  cleanup: post
+  arguments: --out experimental-prometheus-rw --tag testid=hash-go --tag lang=go --tag run=latest
+  runner:
+    nodeSelector:
+      pool: client-pool
+    image: grafana/k6:latest
+    env:
+    - name: RUN_ID
+      value: "latest"
+    - name: K6_PROMETHEUS_RW_SERVER_URL
+      value: "http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090/api/v1/write"
+    - name: K6_PROMETHEUS_RW_TREND_AS_NATIVE_HISTOGRAM
+      value: "false"
+    - name: K6_PROMETHEUS_RW_TREND_STATS
+      value: "p(50),p(90),p(95),p(99),avg"
+---
+apiVersion: k6.io/v1alpha1
+kind: TestRun
+metadata:
+  name: k6-hash-rust
+  namespace: go-server-vs-rust-server
+  labels:
+    target: hash-rust
+spec:
+  parallelism: 1
+  paused: "false"
+  quiet: "false"
+  script:
+    configMap:
+      name: k6-test-hash-rust
+      file: test.js
+  cleanup: post
+  arguments: --out experimental-prometheus-rw --tag testid=hash-rust --tag lang=rust --tag run=latest
+  runner:
+    nodeSelector:
+      pool: client-pool
+    image: grafana/k6:latest
+    env:
+    - name: RUN_ID
+      value: "latest"
+    - name: K6_PROMETHEUS_RW_SERVER_URL
+      value: "http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090/api/v1/write"
+    - name: K6_PROMETHEUS_RW_TREND_AS_NATIVE_HISTOGRAM
+      value: "false"
+    - name: K6_PROMETHEUS_RW_TREND_STATS
+      value: "p(50),p(90),p(95),p(99),avg"
