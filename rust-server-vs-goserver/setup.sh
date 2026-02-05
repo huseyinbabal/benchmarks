@@ -119,11 +119,10 @@ echo ""
 echo "Step 3: Installing monitoring stack..."
 echo "---------------------------------------"
 
-kubectl create namespace monitoring --dry-run=client -o yaml | kubectl apply -f -
-
 print_status "Installing kube-prometheus-stack..."
 helm upgrade --install monitoring prometheus-community/kube-prometheus-stack \
   -n monitoring \
+  --create-namespace \
   -f monitoring-values.yaml \
   --wait --timeout 10m
 
@@ -134,11 +133,10 @@ echo ""
 echo "Step 4: Installing k6 operator..."
 echo "----------------------------------"
 
-kubectl create namespace k6-operator --dry-run=client -o yaml | kubectl apply -f -
-
 print_status "Installing k6-operator..."
 helm upgrade --install k6-operator grafana/k6-operator \
   -n k6-operator \
+  --create-namespace \
   -f k6-values.yaml \
   --wait
 
