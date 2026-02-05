@@ -11,7 +11,7 @@ Both servers perform an identical workload: computing 100 iterations of SHA256 h
 | Framework | `net/http` (stdlib) | `hyper` + `tokio` |
 | Hashing | `crypto/sha256` | `sha2` crate |
 | JSON | `encoding/json` | `serde_json` |
-| Base Image | `alpine:3.19` | `alpine:3.19` |
+| Base Image | `debian:bookworm-slim` | `debian:bookworm-slim` |
 
 ### Benchmark Parameters
 
@@ -24,7 +24,17 @@ Both servers perform an identical workload: computing 100 iterations of SHA256 h
 
 Results from running the benchmark on Hetzner Cloud (k3s cluster).
 
-### Latency (successful requests only)
+---
+
+### Iteration 1: Alpine (musl libc)
+
+**Infrastructure:**
+- Base image: `alpine:3.19` (musl libc)
+- App nodes: cpx32 (8 vCPUs, 16GB RAM)
+- CPU limit per server: 2 cores
+- Memory limit per server: 3Gi
+
+#### Latency (successful requests only)
 
 | Metric | Go Server | Rust Server |
 |--------|-----------|-------------|
@@ -34,19 +44,72 @@ Results from running the benchmark on Hetzner Cloud (k3s cluster).
 | P99    | 3.979 ms  | 2.858 ms    |
 | Avg    | 0.488 ms  | 0.648 ms    |
 
-### Request Statistics
+#### Request Statistics
 
 | Server | Successful   | Failed | Error Rate |
 |--------|--------------|--------|------------|
 | Go     | 9,562,037    | 653    | 0.007%     |
 | Rust   | 13,238,995   | 323    | 0.002%     |
 
-### Key Observations
+#### Key Observations
 
 1. **Go has lower latency** at P50, P90, P95 (approximately 20-40% faster response times)
 2. **Rust has better tail latency** at P99 (2.86ms vs 3.98ms) - more consistent under extreme load
 3. **Rust achieved higher throughput** - 13.2M requests vs 9.5M requests (38% more)
 4. **Both servers are highly reliable** - error rates below 0.01%
+
+---
+
+### Iteration 2: Debian (glibc)
+
+After feedback that Alpine's musl libc has slower `malloc` performance compared to glibc, we re-ran the benchmark with Debian-based images and upgraded infrastructure.
+
+**Infrastructure:**
+- Base image: `debian:bookworm-slim` (glibc)
+- App nodes: cpx42 (16 vCPUs, 32GB RAM)
+- CPU limit per server: 14 cores
+- Memory limit per server: 28Gi
+
+#### Latency (successful requests only)
+
+| Metric | Go Server | Rust Server |
+|--------|-----------|-------------|
+| P50    | 0.256 ms  | 0.376 ms    |
+| P90    | 0.584 ms  | 0.740 ms    |
+| P95    | 0.806 ms  | 0.965 ms    |
+| P99    | 1.368 ms  | 1.874 ms    |
+| Avg    | 0.308 ms  | 0.418 ms    |
+
+#### Request Statistics
+
+| Server | Successful   | Failed | Error Rate |
+|--------|--------------|--------|------------|
+| Go     | 21,800,444   | 0      | 0%         |
+| Rust   | 16,568,556   | 23     | 0.00014%   |
+
+#### Key Observations
+
+1. **Go is faster across all percentiles** - P50 to P99 latency is consistently lower
+2. **Go achieved 32% higher throughput** - 21.8M vs 16.5M requests
+3. **Go had zero failures**, Rust had only 23 (negligible)
+4. **Both servers improved dramatically** with more resources - P99 dropped ~65% for both
+
+---
+
+### Comparison: musl vs glibc
+
+| Metric | Go (musl) | Go (glibc) | Change | Rust (musl) | Rust (glibc) | Change |
+|--------|-----------|------------|--------|-------------|--------------|--------|
+| P50    | 0.274 ms  | 0.256 ms   | -7%    | 0.338 ms    | 0.376 ms     | +11%   |
+| P99    | 3.979 ms  | 1.368 ms   | -66%   | 2.858 ms    | 1.874 ms     | -34%   |
+| Total Requests | 9.5M | 21.8M | +129% | 13.2M | 16.5M | +25% |
+
+#### Summary
+
+- **Go benefited more** from the glibc switch and increased resources, with throughput increasing 129%
+- **Rust's P50 latency slightly increased** with glibc, but P99 improved significantly
+- **Go consistently outperforms Rust** in latency across both configurations
+- **The musl malloc issue** affects both languages, but Go's performance gains were more dramatic
 
 ## Prerequisites
 
@@ -98,7 +161,7 @@ hetzner-k3s create --config iac/hetzner-k3s-cluster.yaml
 | Node Pool | Instance Type | vCPUs | RAM | Count | Purpose |
 |-----------|---------------|-------|-----|-------|---------|
 | Master | cpx22 | 4 | 8GB | 1 | Control plane |
-| app-pool | cpx32 | 8 | 16GB | 2 | Go & Rust servers |
+| app-pool | cpx42 | 16 | 32GB | 2 | Go & Rust servers |
 | monitoring-pool | cpx32 | 8 | 16GB | 1 | Prometheus, Grafana |
 | client-pool | cpx42 | 16 | 32GB | 2 | k6 load generators |
 
@@ -204,8 +267,8 @@ Both servers are deployed with identical resource constraints for fair compariso
 
 | Resource | Request | Limit |
 |----------|---------|-------|
-| CPU | 100m | 2 cores |
-| Memory | 64Mi | 3Gi |
+| CPU | 1 core | 14 cores |
+| Memory | 512Mi | 28Gi |
 
 ## Grafana Dashboard Metrics
 
@@ -244,11 +307,11 @@ Edit `k8s/deployments.yaml` to modify CPU/memory limits:
 ```yaml
 resources:
   limits:
-    cpu: "2"
-    memory: "3Gi"
+    cpu: "14"
+    memory: "28Gi"
   requests:
-    cpu: "100m"
-    memory: "64Mi"
+    cpu: "1"
+    memory: "512Mi"
 ```
 
 ## Troubleshooting
