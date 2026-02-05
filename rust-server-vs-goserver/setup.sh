@@ -138,7 +138,7 @@ helm upgrade --install k6-operator grafana/k6-operator \
   -n k6-operator \
   --create-namespace \
   -f k6-values.yaml \
-  --wait
+  --wait || print_warning "k6-operator already exists, skipping..."
 
 print_status "k6 operator installed"
 
