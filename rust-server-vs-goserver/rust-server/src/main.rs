@@ -15,7 +15,7 @@ use tokio::net::TcpListener;
 struct HashResponse {
     hash: String,
     timestamp: u128,
-    source: String,
+    source: &'static str,
 }
 
 #[tokio::main]
@@ -57,21 +57,19 @@ fn hash_handler() -> Response<Full<Bytes>> {
 
     let input = format!("input-{}", timestamp);
 
-    // SHA256 hash 100 iterations
-    let mut data = input.as_bytes().to_vec();
-    for _ in 0..100 {
-        let mut hasher = Sha256::new();
-        hasher.update(&data);
-        data = hasher.finalize().to_vec();
+    // SHA256 hash 100 iterations - using fixed-size array to avoid allocations
+    let mut data: [u8; 32] = Sha256::digest(input.as_bytes()).into();
+    for _ in 0..99 {
+        data = Sha256::digest(&data).into();
     }
 
     let response = HashResponse {
-        hash: hex::encode(&data),
+        hash: hex::encode(data),
         timestamp: SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap()
             .as_millis(),
-        source: "rust".to_string(),
+        source: "rust",
     };
 
     let json = serde_json::to_string(&response).unwrap();
