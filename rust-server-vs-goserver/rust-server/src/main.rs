@@ -58,15 +58,15 @@ fn hash_handler() -> Response<Full<Bytes>> {
     let input = format!("input-{}", timestamp);
 
     // SHA256 hash 100 iterations
-    let mut data = input.as_bytes().to_vec();
-    for _ in 0..100 {
-        let mut hasher = Sha256::new();
-        hasher.update(&data);
-        data = hasher.finalize().to_vec();
+    let mut hasher = Sha256::new();
+    let mut data: [u8; 32] = Sha256::digest(input.as_bytes()).into();
+    for _ in 1..100 {
+        hasher.update(data);
+        data = hasher.finalize_reset().into();
     }
 
     let response = HashResponse {
-        hash: hex::encode(&data),
+        hash: hex::encode(data),
         timestamp: SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap()
