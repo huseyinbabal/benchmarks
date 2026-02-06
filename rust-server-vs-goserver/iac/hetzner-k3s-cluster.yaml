@@ -65,17 +65,26 @@ worker_node_pools:
   #   - key: something
   #     value: value1:NoSchedule
   - name: app-pool
-    instance_type: cpx32
+    instance_type: cpx42
     instance_count: 2
     location: nbg1
+    labels:
+      - key: pool
+        value: app-pool
   - name: monitoring-pool
     instance_type: cpx32
     instance_count: 1
     location: nbg1
+    labels:
+      - key: pool
+        value: monitoring-pool
   - name: client-pool
     instance_type: cpx42
     instance_count: 2
     location: nbg1
+    labels:
+      - key: pool
+        value: client-pool
 
 embedded_registry_mirror:
   enabled: false # Check if your k3s version is compatible before enabling this option. You can find more information at https://docs.k3s.io/installation/registry-mirror

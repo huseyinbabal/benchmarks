@@ -11,7 +11,7 @@ Both servers perform an identical workload: computing 100 iterations of SHA256 h
 | Framework | `net/http` (stdlib) | `hyper` + `tokio` |
 | Hashing | `crypto/sha256` | `sha2` crate |
 | JSON | `encoding/json` | `serde_json` |
-| Base Image | `alpine:3.19` | `alpine:3.19` |
+| Base Image | `debian:bookworm-slim` | `debian:bookworm-slim` |
 
 ### Benchmark Parameters
 
@@ -19,6 +19,155 @@ Both servers perform an identical workload: computing 100 iterations of SHA256 h
 - **Duration**: 2min ramp-up + 15min sustained load + 30s ramp-down
 - **Load Testing Tool**: k6 with k6-operator
 - **Metrics**: Prometheus + Grafana
+
+## Benchmark Results
+
+Results from running the benchmark on Hetzner Cloud (k3s cluster).
+
+---
+
+### Iteration 1: Alpine (musl libc)
+
+**Infrastructure:**
+- Base image: `alpine:3.19` (musl libc)
+- App nodes: cpx32 (8 vCPUs, 16GB RAM)
+- CPU limit per server: 2 cores
+- Memory limit per server: 3Gi
+
+#### Latency (successful requests only)
+
+| Metric | Go Server | Rust Server |
+|--------|-----------|-------------|
+| P50    | 0.274 ms  | 0.338 ms    |
+| P90    | 1.027 ms  | 1.679 ms    |
+| P95    | 1.615 ms  | 1.950 ms    |
+| P99    | 3.979 ms  | 2.858 ms    |
+| Avg    | 0.488 ms  | 0.648 ms    |
+
+#### Request Statistics
+
+| Server | Successful   | Failed | Error Rate |
+|--------|--------------|--------|------------|
+| Go     | 9,562,037    | 653    | 0.007%     |
+| Rust   | 13,238,995   | 323    | 0.002%     |
+
+#### Key Observations
+
+1. **Go has lower latency** at P50, P90, P95 (approximately 20-40% faster response times)
+2. **Rust has better tail latency** at P99 (2.86ms vs 3.98ms) - more consistent under extreme load
+3. **Rust achieved higher throughput** - 13.2M requests vs 9.5M requests (38% more)
+4. **Both servers are highly reliable** - error rates below 0.01%
+
+---
+
+### Iteration 2: Debian (glibc)
+
+After feedback that Alpine's musl libc has slower `malloc` performance compared to glibc, we re-ran the benchmark with Debian-based images and upgraded infrastructure.
+
+**Infrastructure:**
+- Base image: `debian:bookworm-slim` (glibc)
+- App nodes: cpx42 (16 vCPUs, 32GB RAM)
+- CPU limit per server: 14 cores
+- Memory limit per server: 28Gi
+
+#### Latency (successful requests only)
+
+| Metric | Go Server | Rust Server |
+|--------|-----------|-------------|
+| P50    | 0.256 ms  | 0.376 ms    |
+| P90    | 0.584 ms  | 0.740 ms    |
+| P95    | 0.806 ms  | 0.965 ms    |
+| P99    | 1.368 ms  | 1.874 ms    |
+| Avg    | 0.308 ms  | 0.418 ms    |
+
+#### Request Statistics
+
+| Server | Successful   | Failed | Error Rate |
+|--------|--------------|--------|------------|
+| Go     | 21,800,444   | 0      | 0%         |
+| Rust   | 16,568,556   | 23     | 0.00014%   |
+
+#### Key Observations
+
+1. **Go is faster across all percentiles** - P50 to P99 latency is consistently lower
+2. **Go achieved 32% higher throughput** - 21.8M vs 16.5M requests
+3. **Go had zero failures**, Rust had only 23 (negligible)
+4. **Both servers improved dramatically** with more resources - P99 dropped ~65% for both
+
+---
+
+### Iteration 3: Eliminate Vec Allocations in Rust
+
+Community [PR #1](https://github.com/huseyinbabal/benchmarks/pull/1) identified that the Rust server was allocating `Vec`s inside the hash loop — a significant performance anti-pattern. The fix replaced dynamic `Vec` allocations with fixed-size `[u8; 32]` arrays and changed `source: String` to `source: &'static str`, eliminating all per-request heap allocations in the hot path.
+
+Additionally, k6 load generators were given dedicated resource limits (6 CPU / 12Gi each) to force scheduling onto separate client-pool nodes, eliminating load generator contention observed in iteration 2.
+
+**Changes ([PR #1](https://github.com/huseyinbabal/benchmarks/pull/1)):**
+- `data = input.as_bytes().to_vec()` + `hasher.finalize().to_vec()` → `data: [u8; 32] = Sha256::digest(...).into()`
+- `source: String` → `source: &'static str`
+- k6 runners pinned to separate nodes via resource requests
+
+**Infrastructure:**
+- Base image: `debian:bookworm-slim` (glibc)
+- App nodes: cpx42 (16 vCPUs, 32GB RAM)
+- CPU limit per server: 14 cores
+- Memory limit per server: 28Gi
+- k6 runners: 6 CPU request / 7 CPU limit, 12Gi request / 14Gi limit (each on separate node)
+
+#### Latency (successful requests only)
+
+| Metric | Go Server | Rust Server |
+|--------|-----------|-------------|
+| P50    | 0.255 ms  | 0.203 ms    |
+| P90    | 0.598 ms  | 0.618 ms    |
+| P95    | 0.805 ms  | 1.028 ms    |
+| P99    | 1.230 ms  | 2.286 ms    |
+| Avg    | 0.313 ms  | 0.326 ms    |
+
+#### Request Statistics
+
+| Server | Successful   | Failed | Error Rate |
+|--------|--------------|--------|------------|
+| Go     | 28,553,983   | 0      | 0%         |
+| Rust   | 28,781,423   | 516    | 0.0018%    |
+
+#### Resource Usage (during sustained load)
+
+| Resource | Go Server | Rust Server |
+|----------|-----------|-------------|
+| CPU (avg) | 2.08 cores | 2.44 cores |
+| CPU (peak) | 3.78 cores | 5.24 cores |
+| Memory (peak) | 521 MB | 224 MB |
+
+#### Key Observations
+
+1. **Rust wins at P50** for the first time (0.203ms vs 0.255ms) — 20% faster median latency after eliminating allocations
+2. **Go still dominates tail latency** — P99 is 1.23ms vs 2.29ms (46% lower)
+3. **Throughput is nearly identical** — 28.5M vs 28.8M requests (~1% difference), up from Rust's 16.5M in iteration 2 (74% improvement)
+4. **Rust uses 57% less memory** (224MB vs 521MB) but 17% more CPU on average
+5. **Go had zero failures** again; Rust had 516 timeouts (still negligible at 0.002%)
+6. **Eliminating Vec allocations was the biggest Rust win** — throughput jumped 74% (16.5M → 28.8M) and P50 dropped 46% (0.376ms → 0.203ms)
+
+---
+
+### Comparison Across Iterations
+
+| Metric | Go (Iter 1) | Go (Iter 2) | Go (Iter 3) | Rust (Iter 1) | Rust (Iter 2) | Rust (Iter 3) |
+|--------|-------------|-------------|-------------|---------------|---------------|---------------|
+| P50    | 0.274 ms    | 0.256 ms    | 0.255 ms    | 0.338 ms      | 0.376 ms      | 0.203 ms      |
+| P99    | 3.979 ms    | 1.368 ms    | 1.230 ms    | 2.858 ms      | 1.874 ms      | 2.286 ms      |
+| Total Requests | 9.5M | 21.8M | 28.6M | 13.2M | 16.5M | 28.8M |
+| Failures | 653 | 0 | 0 | 323 | 23 | 516 |
+| Avg CPU | N/A | N/A | 2.08 cores | N/A | N/A | 2.44 cores |
+| Peak Memory | N/A | N/A | 521 MB | N/A | N/A | 224 MB |
+
+#### Summary
+
+- **Iteration 1 (musl)**: Rust had higher throughput but Go had lower latency
+- **Iteration 2 (glibc + more resources)**: Go pulled ahead in both throughput and latency
+- **Iteration 3 (no Vec allocations + dedicated clients)**: Eliminating heap allocations in Rust's hot path was transformative — Rust throughput jumped 74% and P50 beat Go for the first time
+- **Consistent findings**: Go uses more memory but has better tail latency (P99); Rust has superior memory efficiency (57% less in iteration 3)
+- **Lesson**: Unnecessary allocations in hot paths can completely mask a language's true performance. Rust's zero-cost abstractions only pay off when you actually avoid allocations
 
 ## Prerequisites
 
@@ -70,7 +219,7 @@ hetzner-k3s create --config iac/hetzner-k3s-cluster.yaml
 | Node Pool | Instance Type | vCPUs | RAM | Count | Purpose |
 |-----------|---------------|-------|-----|-------|---------|
 | Master | cpx22 | 4 | 8GB | 1 | Control plane |
-| app-pool | cpx32 | 8 | 16GB | 2 | Go & Rust servers |
+| app-pool | cpx42 | 16 | 32GB | 2 | Go & Rust servers |
 | monitoring-pool | cpx32 | 8 | 16GB | 1 | Prometheus, Grafana |
 | client-pool | cpx42 | 16 | 32GB | 2 | k6 load generators |
 
@@ -176,8 +325,8 @@ Both servers are deployed with identical resource constraints for fair compariso
 
 | Resource | Request | Limit |
 |----------|---------|-------|
-| CPU | 100m | 2 cores |
-| Memory | 64Mi | 3Gi |
+| CPU | 1 core | 14 cores |
+| Memory | 512Mi | 28Gi |
 
 ## Grafana Dashboard Metrics
 
@@ -216,11 +365,11 @@ Edit `k8s/deployments.yaml` to modify CPU/memory limits:
 ```yaml
 resources:
   limits:
-    cpu: "2"
-    memory: "3Gi"
+    cpu: "14"
+    memory: "28Gi"
   requests:
-    cpu: "100m"
-    memory: "64Mi"
+    cpu: "1"
+    memory: "512Mi"
 ```
 
 ## Troubleshooting

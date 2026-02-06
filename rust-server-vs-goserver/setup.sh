@@ -7,18 +7,24 @@ set -e
 
 # Parse command line arguments
 USE_HETZNER=false
+GO_TAG="latest"
+RUST_TAG="latest"
 
 print_usage() {
     echo "Usage: $0 [OPTIONS]"
     echo ""
     echo "Options:"
-    echo "  --hetzner    Skip Kind cluster creation and use existing kubeconfig"
-    echo "               (for Hetzner k3s or other external clusters)"
-    echo "  -h, --help   Show this help message"
+    echo "  --hetzner        Skip Kind cluster creation and use existing kubeconfig"
+    echo "                   (for Hetzner k3s or other external clusters)"
+    echo "  --go-tag TAG     Docker image tag for go-server (default: latest)"
+    echo "  --rust-tag TAG   Docker image tag for rust-server (default: latest)"
+    echo "  -h, --help       Show this help message"
     echo ""
     echo "Examples:"
-    echo "  $0              # Create local Kind cluster and deploy"
-    echo "  $0 --hetzner    # Deploy to existing cluster (e.g., Hetzner k3s)"
+    echo "  $0                                    # Create local Kind cluster and deploy"
+    echo "  $0 --hetzner                          # Deploy to existing cluster (e.g., Hetzner k3s)"
+    echo "  $0 --hetzner --go-tag pr-5            # Deploy with go-server from PR #5"
+    echo "  $0 --go-tag pr-5 --rust-tag pr-5      # Deploy both from PR #5"
 }
 
 while [[ $# -gt 0 ]]; do
@@ -26,6 +32,14 @@ while [[ $# -gt 0 ]]; do
         --hetzner)
             USE_HETZNER=true
             shift
+            ;;
+        --go-tag)
+            GO_TAG="$2"
+            shift 2
+            ;;
+        --rust-tag)
+            RUST_TAG="$2"
+            shift 2
             ;;
         -h|--help)
             print_usage
@@ -138,7 +152,7 @@ helm upgrade --install k6-operator grafana/k6-operator \
   -n k6-operator \
   --create-namespace \
   -f k6-values.yaml \
-  --wait
+  --wait || print_warning "k6-operator already exists, skipping..."
 
 print_status "k6 operator installed"
 
@@ -149,8 +163,11 @@ echo "-----------------------------------------"
 
 kubectl create namespace go-server-vs-rust-server --dry-run=client -o yaml | kubectl apply -f -
 
-print_status "Deploying applications..."
-kubectl apply -f k8s/deployments.yaml
+print_status "Deploying applications (go-server:${GO_TAG}, rust-server:${RUST_TAG})..."
+sed \
+  -e "s|ghcr.io/huseyinbabal/benchmarks/go-server:latest|ghcr.io/huseyinbabal/benchmarks/go-server:${GO_TAG}|g" \
+  -e "s|ghcr.io/huseyinbabal/benchmarks/rust-server:latest|ghcr.io/huseyinbabal/benchmarks/rust-server:${RUST_TAG}|g" \
+  k8s/deployments.yaml | kubectl apply -f -
 
 print_status "Waiting for deployments to be ready..."
 kubectl wait --for=condition=available deployment/hash-go -n go-server-vs-rust-server --timeout=120s
@@ -190,6 +207,10 @@ echo "=========================================="
 echo "  Setup Complete!"
 echo "=========================================="
 echo ""
+echo "Deployed images:"
+echo "  go-server:   ghcr.io/huseyinbabal/benchmarks/go-server:${GO_TAG}"
+echo "  rust-server: ghcr.io/huseyinbabal/benchmarks/rust-server:${RUST_TAG}"
+echo ""
 echo "Next steps:"
 echo ""
 echo "1. Access Grafana:"
@@ -198,12 +219,14 @@ echo "   Open: http://localhost:3000"
 echo "   Login: admin / prom-operator"
 echo ""
 echo "2. Run the benchmarks:"
-echo "   kubectl apply -f k6/testruns.yaml"
+echo "   ./run-benchmark.sh --run-id iteration-1"
 echo ""
 echo "3. Watch the tests:"
 echo "   kubectl get testruns -n go-server-vs-rust-server -w"
 echo ""
 echo "4. View pod status:"
 echo "   kubectl get pods -n go-server-vs-rust-server -w"
+echo ""
+echo "5. In Grafana, select your run from the 'Run' dropdown to view the benchmark"
 echo ""
 print_status "Happy benchmarking!"

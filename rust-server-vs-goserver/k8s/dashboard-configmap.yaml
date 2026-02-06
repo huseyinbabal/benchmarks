@@ -25,9 +25,7 @@ data:
           },
           "fieldConfig": {
             "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
+              "color": { "mode": "palette-classic" },
               "custom": {
                 "axisBorderShow": false,
                 "axisCenteredZero": false,
@@ -38,1163 +36,415 @@ data:
                 "drawStyle": "line",
                 "fillOpacity": 10,
                 "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
+                "hideFrom": { "legend": false, "tooltip": false, "viz": false },
                 "insertNulls": false,
                 "lineInterpolation": "smooth",
                 "lineWidth": 2,
                 "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
+                "scaleDistribution": { "type": "linear" },
                 "showPoints": "never",
                 "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
+                "stacking": { "group": "A", "mode": "none" },
+                "thresholdsStyle": { "mode": "off" }
               },
               "mappings": [],
               "thresholds": {
                 "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  }
-                ]
+                "steps": [{ "color": "green", "value": null }]
               },
               "unit": "reqps"
             },
             "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Go"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#00ADD8",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Rust"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#DEA584",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              }
+              { "matcher": { "id": "byName", "options": "Go" }, "properties": [{ "id": "color", "value": { "fixedColor": "#00ADD8", "mode": "fixed" } }] },
+              { "matcher": { "id": "byName", "options": "Rust" }, "properties": [{ "id": "color", "value": { "fixedColor": "#DEA584", "mode": "fixed" } }] }
             ]
           },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 0,
-            "y": 0
-          },
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
           "id": 1,
           "options": {
-            "legend": {
-              "calcs": ["mean", "max"],
-              "displayMode": "table",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
+            "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+            "tooltip": { "mode": "multi", "sort": "desc" }
           },
           "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "rate(k6_http_reqs_total{testid=\"hash-go\",run=~\"$run\"}[30s])",
-              "legendFormat": "Go",
-              "range": true,
-              "refId": "A"
-            },
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "rate(k6_http_reqs_total{testid=\"hash-rust\",run=~\"$run\"}[30s])",
-              "legendFormat": "Rust",
-              "range": true,
-              "refId": "B"
-            }
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "sum(rate(k6_http_reqs_total{testid=\"hash-go\",run=~\"$run\"}[30s]))", "legendFormat": "Go", "range": true, "refId": "A" },
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "sum(rate(k6_http_reqs_total{testid=\"hash-rust\",run=~\"$run\"}[30s]))", "legendFormat": "Rust", "range": true, "refId": "B" }
           ],
           "title": "Requests per Second",
           "type": "timeseries"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
           "fieldConfig": {
             "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
+              "color": { "mode": "palette-classic" },
               "custom": {
-                "axisBorderShow": false,
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "Latency",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 10,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "insertNulls": false,
-                "lineInterpolation": "smooth",
-                "lineWidth": 2,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "never",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
+                "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "Latency", "axisPlacement": "auto",
+                "barAlignment": 0, "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none",
+                "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                "insertNulls": false, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5,
+                "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": false,
+                "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" }
               },
               "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  }
-                ]
-              },
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
               "unit": "ms"
             },
             "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Go"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#00ADD8",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Rust"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#DEA584",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              }
+              { "matcher": { "id": "byName", "options": "Go" }, "properties": [{ "id": "color", "value": { "fixedColor": "#00ADD8", "mode": "fixed" } }] },
+              { "matcher": { "id": "byName", "options": "Rust" }, "properties": [{ "id": "color", "value": { "fixedColor": "#DEA584", "mode": "fixed" } }] }
             ]
           },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 0
-          },
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
           "id": 2,
           "options": {
-            "legend": {
-              "calcs": ["mean", "max"],
-              "displayMode": "table",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
+            "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+            "tooltip": { "mode": "multi", "sort": "desc" }
           },
           "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "k6_http_req_duration_p99{testid=\"hash-go\",run=~\"$run\"}",
-              "legendFormat": "Go",
-              "range": true,
-              "refId": "A"
-            },
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "k6_http_req_duration_p99{testid=\"hash-rust\",run=~\"$run\"}",
-              "legendFormat": "Rust",
-              "range": true,
-              "refId": "B"
-            }
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "k6_http_req_duration_p99{testid=\"hash-go\",run=~\"$run\",expected_response=\"true\"}", "legendFormat": "Go", "range": true, "refId": "A" },
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "k6_http_req_duration_p99{testid=\"hash-rust\",run=~\"$run\",expected_response=\"true\"}", "legendFormat": "Rust", "range": true, "refId": "B" }
           ],
           "title": "Latency p99",
           "type": "timeseries"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
           "fieldConfig": {
             "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
+              "color": { "mode": "palette-classic" },
               "custom": {
-                "axisBorderShow": false,
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "Latency",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 10,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "insertNulls": false,
-                "lineInterpolation": "smooth",
-                "lineWidth": 2,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "never",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
+                "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "VUs", "axisPlacement": "auto",
+                "barAlignment": 0, "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none",
+                "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                "insertNulls": false, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5,
+                "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": false,
+                "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" }
               },
               "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  }
-                ]
-              },
-              "unit": "ms"
-            },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Go"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#00ADD8",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Rust"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#DEA584",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 8
-          },
-          "id": 11,
-          "options": {
-            "legend": {
-              "calcs": ["mean", "max"],
-              "displayMode": "table",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "k6_http_req_duration_p95{testid=\"hash-go\",run=~\"$run\"}",
-              "legendFormat": "Go",
-              "range": true,
-              "refId": "A"
-            },
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "k6_http_req_duration_p95{testid=\"hash-rust\",run=~\"$run\"}",
-              "legendFormat": "Rust",
-              "range": true,
-              "refId": "B"
-            }
-          ],
-          "title": "Latency p95",
-          "type": "timeseries"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisBorderShow": false,
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "VUs",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 10,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "insertNulls": false,
-                "lineInterpolation": "smooth",
-                "lineWidth": 2,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "never",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  }
-                ]
-              },
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
               "unit": "short"
             },
             "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Go"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#00ADD8",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Rust"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#DEA584",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              }
+              { "matcher": { "id": "byName", "options": "Go" }, "properties": [{ "id": "color", "value": { "fixedColor": "#00ADD8", "mode": "fixed" } }] },
+              { "matcher": { "id": "byName", "options": "Rust" }, "properties": [{ "id": "color", "value": { "fixedColor": "#DEA584", "mode": "fixed" } }] }
             ]
           },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 0,
-            "y": 8
-          },
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
           "id": 3,
           "options": {
-            "legend": {
-              "calcs": ["mean", "max"],
-              "displayMode": "table",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
+            "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+            "tooltip": { "mode": "multi", "sort": "desc" }
           },
           "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "k6_vus{testid=\"hash-go\",run=~\"$run\"}",
-              "legendFormat": "Go",
-              "range": true,
-              "refId": "A"
-            },
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "k6_vus{testid=\"hash-rust\",run=~\"$run\"}",
-              "legendFormat": "Rust",
-              "range": true,
-              "refId": "B"
-            }
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "k6_vus{testid=\"hash-go\",run=~\"$run\"}", "legendFormat": "Go", "range": true, "refId": "A" },
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "k6_vus{testid=\"hash-rust\",run=~\"$run\"}", "legendFormat": "Rust", "range": true, "refId": "B" }
           ],
           "title": "Virtual Users",
           "type": "timeseries"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
           "fieldConfig": {
             "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
+              "color": { "mode": "palette-classic" },
               "custom": {
-                "axisBorderShow": false,
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "Latency",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 10,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "insertNulls": false,
-                "lineInterpolation": "smooth",
-                "lineWidth": 2,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "never",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
+                "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "Latency", "axisPlacement": "auto",
+                "barAlignment": 0, "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none",
+                "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                "insertNulls": false, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5,
+                "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": false,
+                "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" }
               },
               "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  }
-                ]
-              },
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
               "unit": "ms"
             },
             "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Go avg"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#00ADD8",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Rust avg"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#DEA584",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              }
+              { "matcher": { "id": "byName", "options": "Go" }, "properties": [{ "id": "color", "value": { "fixedColor": "#00ADD8", "mode": "fixed" } }] },
+              { "matcher": { "id": "byName", "options": "Rust" }, "properties": [{ "id": "color", "value": { "fixedColor": "#DEA584", "mode": "fixed" } }] }
             ]
           },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 8
-          },
-          "id": 4,
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+          "id": 11,
           "options": {
-            "legend": {
-              "calcs": ["mean", "max"],
-              "displayMode": "table",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
+            "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+            "tooltip": { "mode": "multi", "sort": "desc" }
           },
           "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "rate(k6_iteration_duration_seconds_sum{testid=\"hash-go\",run=~\"$run\"}[30s]) / rate(k6_iteration_duration_seconds_count{testid=\"hash-go\",run=~\"$run\"}[30s]) * 1000",
-              "legendFormat": "Go",
-              "range": true,
-              "refId": "A"
-            },
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "rate(k6_iteration_duration_seconds_sum{testid=\"hash-rust\",run=~\"$run\"}[30s]) / rate(k6_iteration_duration_seconds_count{testid=\"hash-rust\",run=~\"$run\"}[30s]) * 1000",
-              "legendFormat": "Rust",
-              "range": true,
-              "refId": "B"
-            }
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "k6_http_req_duration_p95{testid=\"hash-go\",run=~\"$run\",expected_response=\"true\"}", "legendFormat": "Go", "range": true, "refId": "A" },
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "k6_http_req_duration_p95{testid=\"hash-rust\",run=~\"$run\",expected_response=\"true\"}", "legendFormat": "Rust", "range": true, "refId": "B" }
           ],
-          "title": "Average Latency (Iteration)",
+          "title": "Latency p95",
           "type": "timeseries"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
           "fieldConfig": {
             "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
+              "color": { "mode": "thresholds" },
               "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  }
-                ]
-              },
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
               "unit": "short"
             },
             "overrides": []
           },
-          "gridPos": {
-            "h": 4,
-            "w": 6,
-            "x": 0,
-            "y": 16
-          },
+          "gridPos": { "h": 4, "w": 6, "x": 0, "y": 16 },
           "id": 5,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "area",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "reduceOptions": {
-              "calcs": ["lastNotNull"],
-              "fields": "",
-              "values": false
-            },
-            "textMode": "auto"
-          },
+          "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
           "pluginVersion": "10.0.0",
           "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "k6_http_reqs_total{testid=\"hash-go\",run=~\"$run\"}",
-              "legendFormat": "__auto",
-              "range": true,
-              "refId": "A"
-            }
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "sum(k6_http_reqs_total{testid=\"hash-go\",run=~\"$run\"})", "legendFormat": "__auto", "range": true, "refId": "A" }
           ],
           "title": "Go Total Requests",
           "type": "stat"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
           "fieldConfig": {
             "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
+              "color": { "mode": "thresholds" },
               "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  }
-                ]
-              },
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
               "unit": "short"
             },
             "overrides": []
           },
-          "gridPos": {
-            "h": 4,
-            "w": 6,
-            "x": 6,
-            "y": 16
-          },
+          "gridPos": { "h": 4, "w": 6, "x": 6, "y": 16 },
           "id": 6,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "area",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "reduceOptions": {
-              "calcs": ["lastNotNull"],
-              "fields": "",
-              "values": false
-            },
-            "textMode": "auto"
-          },
+          "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
           "pluginVersion": "10.0.0",
           "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "k6_http_reqs_total{testid=\"hash-rust\",run=~\"$run\"}",
-              "legendFormat": "__auto",
-              "range": true,
-              "refId": "A"
-            }
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "sum(k6_http_reqs_total{testid=\"hash-rust\",run=~\"$run\"})", "legendFormat": "__auto", "range": true, "refId": "A" }
           ],
           "title": "Rust Total Requests",
           "type": "stat"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
           "fieldConfig": {
             "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
+              "color": { "mode": "thresholds" },
               "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 1
-                  }
-                ]
-              },
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] },
               "unit": "percentunit"
             },
             "overrides": []
           },
-          "gridPos": {
-            "h": 4,
-            "w": 6,
-            "x": 12,
-            "y": 16
-          },
+          "gridPos": { "h": 4, "w": 6, "x": 12, "y": 16 },
           "id": 7,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "area",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "reduceOptions": {
-              "calcs": ["lastNotNull"],
-              "fields": "",
-              "values": false
-            },
-            "textMode": "auto"
-          },
+          "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
           "pluginVersion": "10.0.0",
           "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "k6_http_req_failed{testid=\"hash-go\",run=~\"$run\"}",
-              "legendFormat": "__auto",
-              "range": true,
-              "refId": "A"
-            }
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "k6_http_req_failed{testid=\"hash-go\",run=~\"$run\"}", "legendFormat": "__auto", "range": true, "refId": "A" }
           ],
           "title": "Go Failed Requests",
           "type": "stat"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
           "fieldConfig": {
             "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
+              "color": { "mode": "thresholds" },
               "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 1
-                  }
-                ]
-              },
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] },
               "unit": "percentunit"
             },
             "overrides": []
           },
-          "gridPos": {
-            "h": 4,
-            "w": 6,
-            "x": 18,
-            "y": 16
-          },
+          "gridPos": { "h": 4, "w": 6, "x": 18, "y": 16 },
           "id": 8,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "area",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "reduceOptions": {
-              "calcs": ["lastNotNull"],
-              "fields": "",
-              "values": false
-            },
-            "textMode": "auto"
-          },
+          "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
           "pluginVersion": "10.0.0",
           "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "k6_http_req_failed{testid=\"hash-rust\",run=~\"$run\"}",
-              "legendFormat": "__auto",
-              "range": true,
-              "refId": "A"
-            }
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "k6_http_req_failed{testid=\"hash-rust\",run=~\"$run\"}", "legendFormat": "__auto", "range": true, "refId": "A" }
           ],
           "title": "Rust Failed Requests",
           "type": "stat"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 20 },
+          "id": 100,
+          "title": "Server Pods - Resource Usage",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
           "fieldConfig": {
             "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
+              "color": { "mode": "palette-classic" },
               "custom": {
-                "axisBorderShow": false,
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "CPU Cores",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 10,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "insertNulls": false,
-                "lineInterpolation": "smooth",
-                "lineWidth": 2,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "never",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
+                "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "CPU Cores", "axisPlacement": "auto",
+                "barAlignment": 0, "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none",
+                "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                "insertNulls": false, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5,
+                "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": false,
+                "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" }
               },
               "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  }
-                ]
-              },
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
               "unit": "short"
             },
             "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Go"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#00ADD8",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Rust"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#DEA584",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              }
+              { "matcher": { "id": "byName", "options": "Go Usage" }, "properties": [{ "id": "color", "value": { "fixedColor": "#00ADD8", "mode": "fixed" } }] },
+              { "matcher": { "id": "byName", "options": "Rust Usage" }, "properties": [{ "id": "color", "value": { "fixedColor": "#DEA584", "mode": "fixed" } }] },
+              { "matcher": { "id": "byName", "options": "Go Limit" }, "properties": [{ "id": "color", "value": { "fixedColor": "#00ADD8", "mode": "fixed" } }, { "id": "custom.lineStyle", "value": { "fill": "dash", "dash": [10, 10] } }, { "id": "custom.fillOpacity", "value": 0 }] },
+              { "matcher": { "id": "byName", "options": "Rust Limit" }, "properties": [{ "id": "color", "value": { "fixedColor": "#DEA584", "mode": "fixed" } }, { "id": "custom.lineStyle", "value": { "fill": "dash", "dash": [10, 10] } }, { "id": "custom.fillOpacity", "value": 0 }] },
+              { "matcher": { "id": "byName", "options": "Go Request" }, "properties": [{ "id": "color", "value": { "fixedColor": "#00ADD8", "mode": "fixed" } }, { "id": "custom.lineStyle", "value": { "fill": "dot", "dash": [0, 10] } }, { "id": "custom.fillOpacity", "value": 0 }, { "id": "custom.lineWidth", "value": 1 }] },
+              { "matcher": { "id": "byName", "options": "Rust Request" }, "properties": [{ "id": "color", "value": { "fixedColor": "#DEA584", "mode": "fixed" } }, { "id": "custom.lineStyle", "value": { "fill": "dot", "dash": [0, 10] } }, { "id": "custom.fillOpacity", "value": 0 }, { "id": "custom.lineWidth", "value": 1 }] }
             ]
           },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 0,
-            "y": 20
-          },
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 21 },
           "id": 9,
           "options": {
-            "legend": {
-              "calcs": ["mean", "max"],
-              "displayMode": "table",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
+            "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+            "tooltip": { "mode": "multi", "sort": "desc" }
           },
           "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "rate(container_cpu_usage_seconds_total{namespace=\"redis-benchmark\", pod=~\"hash-go.*\", container=\"hash-go\"}[30s])",
-              "legendFormat": "Go",
-              "range": true,
-              "refId": "A"
-            },
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "rate(container_cpu_usage_seconds_total{namespace=\"redis-benchmark\", pod=~\"hash-rust.*\", container=\"hash-rust\"}[30s])",
-              "legendFormat": "Rust",
-              "range": true,
-              "refId": "B"
-            }
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "rate(container_cpu_usage_seconds_total{namespace=\"go-server-vs-rust-server\", pod=~\"hash-go.*\", container=\"hash-go\"}[30s])", "legendFormat": "Go Usage", "range": true, "refId": "A" },
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "rate(container_cpu_usage_seconds_total{namespace=\"go-server-vs-rust-server\", pod=~\"hash-rust.*\", container=\"hash-rust\"}[30s])", "legendFormat": "Rust Usage", "range": true, "refId": "B" },
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "kube_pod_container_resource_limits{namespace=\"go-server-vs-rust-server\", pod=~\"hash-go.*\", container=\"hash-go\", resource=\"cpu\"}", "legendFormat": "Go Limit", "range": true, "refId": "C" },
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "kube_pod_container_resource_limits{namespace=\"go-server-vs-rust-server\", pod=~\"hash-rust.*\", container=\"hash-rust\", resource=\"cpu\"}", "legendFormat": "Rust Limit", "range": true, "refId": "D" },
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "kube_pod_container_resource_requests{namespace=\"go-server-vs-rust-server\", pod=~\"hash-go.*\", container=\"hash-go\", resource=\"cpu\"}", "legendFormat": "Go Request", "range": true, "refId": "E" },
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "kube_pod_container_resource_requests{namespace=\"go-server-vs-rust-server\", pod=~\"hash-rust.*\", container=\"hash-rust\", resource=\"cpu\"}", "legendFormat": "Rust Request", "range": true, "refId": "F" }
           ],
-          "title": "CPU Usage (cores)",
+          "title": "Server CPU Usage & Limits",
           "type": "timeseries"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
           "fieldConfig": {
             "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
+              "color": { "mode": "palette-classic" },
               "custom": {
-                "axisBorderShow": false,
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "Memory",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 10,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "insertNulls": false,
-                "lineInterpolation": "smooth",
-                "lineWidth": 2,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "never",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
+                "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "Memory", "axisPlacement": "auto",
+                "barAlignment": 0, "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none",
+                "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                "insertNulls": false, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5,
+                "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": false,
+                "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" }
               },
               "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  }
-                ]
-              },
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
               "unit": "bytes"
             },
             "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Go"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#00ADD8",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Rust"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#DEA584",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              }
+              { "matcher": { "id": "byName", "options": "Go Usage" }, "properties": [{ "id": "color", "value": { "fixedColor": "#00ADD8", "mode": "fixed" } }] },
+              { "matcher": { "id": "byName", "options": "Rust Usage" }, "properties": [{ "id": "color", "value": { "fixedColor": "#DEA584", "mode": "fixed" } }] },
+              { "matcher": { "id": "byName", "options": "Go Limit" }, "properties": [{ "id": "color", "value": { "fixedColor": "#00ADD8", "mode": "fixed" } }, { "id": "custom.lineStyle", "value": { "fill": "dash", "dash": [10, 10] } }, { "id": "custom.fillOpacity", "value": 0 }] },
+              { "matcher": { "id": "byName", "options": "Rust Limit" }, "properties": [{ "id": "color", "value": { "fixedColor": "#DEA584", "mode": "fixed" } }, { "id": "custom.lineStyle", "value": { "fill": "dash", "dash": [10, 10] } }, { "id": "custom.fillOpacity", "value": 0 }] },
+              { "matcher": { "id": "byName", "options": "Go Request" }, "properties": [{ "id": "color", "value": { "fixedColor": "#00ADD8", "mode": "fixed" } }, { "id": "custom.lineStyle", "value": { "fill": "dot", "dash": [0, 10] } }, { "id": "custom.fillOpacity", "value": 0 }, { "id": "custom.lineWidth", "value": 1 }] },
+              { "matcher": { "id": "byName", "options": "Rust Request" }, "properties": [{ "id": "color", "value": { "fixedColor": "#DEA584", "mode": "fixed" } }, { "id": "custom.lineStyle", "value": { "fill": "dot", "dash": [0, 10] } }, { "id": "custom.fillOpacity", "value": 0 }, { "id": "custom.lineWidth", "value": 1 }] }
             ]
           },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 20
-          },
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 21 },
           "id": 10,
           "options": {
-            "legend": {
-              "calcs": ["mean", "max"],
-              "displayMode": "table",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
+            "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+            "tooltip": { "mode": "multi", "sort": "desc" }
           },
           "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "container_memory_rss{namespace=\"redis-benchmark\", pod=~\"hash-go.*\", container=\"hash-go\"}",
-              "legendFormat": "Go",
-              "range": true,
-              "refId": "A"
-            },
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "container_memory_rss{namespace=\"redis-benchmark\", pod=~\"hash-rust.*\", container=\"hash-rust\"}",
-              "legendFormat": "Rust",
-              "range": true,
-              "refId": "B"
-            }
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "container_memory_working_set_bytes{namespace=\"go-server-vs-rust-server\", pod=~\"hash-go.*\", container=\"hash-go\"}", "legendFormat": "Go Usage", "range": true, "refId": "A" },
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "container_memory_working_set_bytes{namespace=\"go-server-vs-rust-server\", pod=~\"hash-rust.*\", container=\"hash-rust\"}", "legendFormat": "Rust Usage", "range": true, "refId": "B" },
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "kube_pod_container_resource_limits{namespace=\"go-server-vs-rust-server\", pod=~\"hash-go.*\", container=\"hash-go\", resource=\"memory\"}", "legendFormat": "Go Limit", "range": true, "refId": "C" },
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "kube_pod_container_resource_limits{namespace=\"go-server-vs-rust-server\", pod=~\"hash-rust.*\", container=\"hash-rust\", resource=\"memory\"}", "legendFormat": "Rust Limit", "range": true, "refId": "D" },
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "kube_pod_container_resource_requests{namespace=\"go-server-vs-rust-server\", pod=~\"hash-go.*\", container=\"hash-go\", resource=\"memory\"}", "legendFormat": "Go Request", "range": true, "refId": "E" },
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "kube_pod_container_resource_requests{namespace=\"go-server-vs-rust-server\", pod=~\"hash-rust.*\", container=\"hash-rust\", resource=\"memory\"}", "legendFormat": "Rust Request", "range": true, "refId": "F" }
           ],
-          "title": "Memory Usage (RSS)",
+          "title": "Server Memory Usage & Limits",
+          "type": "timeseries"
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 29 },
+          "id": 101,
+          "title": "Client Pods (k6) - Resource Usage",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": {
+                "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "CPU Cores", "axisPlacement": "auto",
+                "barAlignment": 0, "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none",
+                "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                "insertNulls": false, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5,
+                "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": false,
+                "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" }
+              },
+              "mappings": [],
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+              "unit": "short"
+            },
+            "overrides": [
+              { "matcher": { "id": "byName", "options": "k6-go Usage" }, "properties": [{ "id": "color", "value": { "fixedColor": "#00ADD8", "mode": "fixed" } }] },
+              { "matcher": { "id": "byName", "options": "k6-rust Usage" }, "properties": [{ "id": "color", "value": { "fixedColor": "#DEA584", "mode": "fixed" } }] },
+              { "matcher": { "id": "byName", "options": "k6-go Limit" }, "properties": [{ "id": "color", "value": { "fixedColor": "#00ADD8", "mode": "fixed" } }, { "id": "custom.lineStyle", "value": { "fill": "dash", "dash": [10, 10] } }, { "id": "custom.fillOpacity", "value": 0 }] },
+              { "matcher": { "id": "byName", "options": "k6-rust Limit" }, "properties": [{ "id": "color", "value": { "fixedColor": "#DEA584", "mode": "fixed" } }, { "id": "custom.lineStyle", "value": { "fill": "dash", "dash": [10, 10] } }, { "id": "custom.fillOpacity", "value": 0 }] },
+              { "matcher": { "id": "byName", "options": "k6-go Request" }, "properties": [{ "id": "color", "value": { "fixedColor": "#00ADD8", "mode": "fixed" } }, { "id": "custom.lineStyle", "value": { "fill": "dot", "dash": [0, 10] } }, { "id": "custom.fillOpacity", "value": 0 }, { "id": "custom.lineWidth", "value": 1 }] },
+              { "matcher": { "id": "byName", "options": "k6-rust Request" }, "properties": [{ "id": "color", "value": { "fixedColor": "#DEA584", "mode": "fixed" } }, { "id": "custom.lineStyle", "value": { "fill": "dot", "dash": [0, 10] } }, { "id": "custom.fillOpacity", "value": 0 }, { "id": "custom.lineWidth", "value": 1 }] }
+            ]
+          },
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 30 },
+          "id": 12,
+          "options": {
+            "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+            "tooltip": { "mode": "multi", "sort": "desc" }
+          },
+          "targets": [
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "rate(container_cpu_usage_seconds_total{namespace=\"go-server-vs-rust-server\", pod=~\"k6-hash-go-.*\", container!=\"\", container!=\"POD\"}[30s])", "legendFormat": "k6-go Usage", "range": true, "refId": "A" },
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "rate(container_cpu_usage_seconds_total{namespace=\"go-server-vs-rust-server\", pod=~\"k6-hash-rust-.*\", container!=\"\", container!=\"POD\"}[30s])", "legendFormat": "k6-rust Usage", "range": true, "refId": "B" },
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "kube_pod_container_resource_limits{namespace=\"go-server-vs-rust-server\", pod=~\"k6-hash-go-.*\", resource=\"cpu\"}", "legendFormat": "k6-go Limit", "range": true, "refId": "C" },
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "kube_pod_container_resource_limits{namespace=\"go-server-vs-rust-server\", pod=~\"k6-hash-rust-.*\", resource=\"cpu\"}", "legendFormat": "k6-rust Limit", "range": true, "refId": "D" },
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "kube_pod_container_resource_requests{namespace=\"go-server-vs-rust-server\", pod=~\"k6-hash-go-.*\", resource=\"cpu\"}", "legendFormat": "k6-go Request", "range": true, "refId": "E" },
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "kube_pod_container_resource_requests{namespace=\"go-server-vs-rust-server\", pod=~\"k6-hash-rust-.*\", resource=\"cpu\"}", "legendFormat": "k6-rust Request", "range": true, "refId": "F" }
+          ],
+          "title": "Client (k6) CPU Usage & Limits",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": {
+                "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "Memory", "axisPlacement": "auto",
+                "barAlignment": 0, "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none",
+                "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                "insertNulls": false, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5,
+                "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": false,
+                "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" }
+              },
+              "mappings": [],
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+              "unit": "bytes"
+            },
+            "overrides": [
+              { "matcher": { "id": "byName", "options": "k6-go Usage" }, "properties": [{ "id": "color", "value": { "fixedColor": "#00ADD8", "mode": "fixed" } }] },
+              { "matcher": { "id": "byName", "options": "k6-rust Usage" }, "properties": [{ "id": "color", "value": { "fixedColor": "#DEA584", "mode": "fixed" } }] },
+              { "matcher": { "id": "byName", "options": "k6-go Limit" }, "properties": [{ "id": "color", "value": { "fixedColor": "#00ADD8", "mode": "fixed" } }, { "id": "custom.lineStyle", "value": { "fill": "dash", "dash": [10, 10] } }, { "id": "custom.fillOpacity", "value": 0 }] },
+              { "matcher": { "id": "byName", "options": "k6-rust Limit" }, "properties": [{ "id": "color", "value": { "fixedColor": "#DEA584", "mode": "fixed" } }, { "id": "custom.lineStyle", "value": { "fill": "dash", "dash": [10, 10] } }, { "id": "custom.fillOpacity", "value": 0 }] },
+              { "matcher": { "id": "byName", "options": "k6-go Request" }, "properties": [{ "id": "color", "value": { "fixedColor": "#00ADD8", "mode": "fixed" } }, { "id": "custom.lineStyle", "value": { "fill": "dot", "dash": [0, 10] } }, { "id": "custom.fillOpacity", "value": 0 }, { "id": "custom.lineWidth", "value": 1 }] },
+              { "matcher": { "id": "byName", "options": "k6-rust Request" }, "properties": [{ "id": "color", "value": { "fixedColor": "#DEA584", "mode": "fixed" } }, { "id": "custom.lineStyle", "value": { "fill": "dot", "dash": [0, 10] } }, { "id": "custom.fillOpacity", "value": 0 }, { "id": "custom.lineWidth", "value": 1 }] }
+            ]
+          },
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 30 },
+          "id": 13,
+          "options": {
+            "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+            "tooltip": { "mode": "multi", "sort": "desc" }
+          },
+          "targets": [
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "container_memory_working_set_bytes{namespace=\"go-server-vs-rust-server\", pod=~\"k6-hash-go-.*\", container!=\"\", container!=\"POD\"}", "legendFormat": "k6-go Usage", "range": true, "refId": "A" },
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "container_memory_working_set_bytes{namespace=\"go-server-vs-rust-server\", pod=~\"k6-hash-rust-.*\", container!=\"\", container!=\"POD\"}", "legendFormat": "k6-rust Usage", "range": true, "refId": "B" },
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "kube_pod_container_resource_limits{namespace=\"go-server-vs-rust-server\", pod=~\"k6-hash-go-.*\", resource=\"memory\"}", "legendFormat": "k6-go Limit", "range": true, "refId": "C" },
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "kube_pod_container_resource_limits{namespace=\"go-server-vs-rust-server\", pod=~\"k6-hash-rust-.*\", resource=\"memory\"}", "legendFormat": "k6-rust Limit", "range": true, "refId": "D" },
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "kube_pod_container_resource_requests{namespace=\"go-server-vs-rust-server\", pod=~\"k6-hash-go-.*\", resource=\"memory\"}", "legendFormat": "k6-go Request", "range": true, "refId": "E" },
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "kube_pod_container_resource_requests{namespace=\"go-server-vs-rust-server\", pod=~\"k6-hash-rust-.*\", resource=\"memory\"}", "legendFormat": "k6-rust Request", "range": true, "refId": "F" }
+          ],
+          "title": "Client (k6) Memory Usage & Limits",
           "type": "timeseries"
         }
       ],
@@ -1208,14 +458,14 @@ data:
             "allValue": ".*",
             "current": {
               "selected": false,
-              "text": "latest",
-              "value": "latest"
+              "text": "All",
+              "value": "$__all"
             },
             "datasource": {
               "type": "prometheus",
               "uid": "prometheus"
             },
-            "definition": "label_values(run)",
+            "definition": "label_values(k6_http_reqs_total, run)",
             "hide": 0,
             "includeAll": true,
             "label": "Run",
@@ -1223,10 +473,10 @@ data:
             "name": "run",
             "options": [],
             "query": {
-              "query": "label_values(run)",
+              "query": "label_values(k6_http_reqs_total, run)",
               "refId": "StandardVariableQuery"
             },
-            "refresh": 1,
+            "refresh": 2,
             "regex": "",
             "sort": 3,
             "type": "query"
@@ -1234,13 +484,13 @@ data:
         ]
       },
       "time": {
-        "from": "now-15m",
+        "from": "now-30m",
         "to": "now"
       },
       "timepicker": {},
       "timezone": "",
       "title": "Go vs Rust Benchmark",
       "uid": "go-vs-rust-benchmark",
-      "version": 2,
+      "version": 3,
       "weekStart": ""
     }

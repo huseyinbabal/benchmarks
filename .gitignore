@@ -1,5 +1,5 @@
 # Build artifacts
-rust-server/target/
+**/target/
 go-server/go-server
 
 # Kubernetes credentials
