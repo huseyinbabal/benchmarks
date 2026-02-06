@@ -20,6 +20,13 @@ spec:
     nodeSelector:
       pool: client-pool
     image: grafana/k6:latest
+    resources:
+      requests:
+        cpu: "6"
+        memory: "12Gi"
+      limits:
+        cpu: "7"
+        memory: "14Gi"
     env:
     - name: RUN_ID
       value: "latest"
@@ -51,6 +58,13 @@ spec:
     nodeSelector:
       pool: client-pool
     image: grafana/k6:latest
+    resources:
+      requests:
+        cpu: "6"
+        memory: "12Gi"
+      limits:
+        cpu: "7"
+        memory: "14Gi"
     env:
     - name: RUN_ID
       value: "latest"
