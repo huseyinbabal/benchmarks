@@ -96,20 +96,71 @@ After feedback that Alpine's musl libc has slower `malloc` performance compared 
 
 ---
 
-### Comparison: musl vs glibc
+### Iteration 3: Dedicated Client Nodes
 
-| Metric | Go (musl) | Go (glibc) | Change | Rust (musl) | Rust (glibc) | Change |
-|--------|-----------|------------|--------|-------------|--------------|--------|
-| P50    | 0.274 ms  | 0.256 ms   | -7%    | 0.338 ms    | 0.376 ms     | +11%   |
-| P99    | 3.979 ms  | 1.368 ms   | -66%   | 2.858 ms    | 1.874 ms     | -34%   |
-| Total Requests | 9.5M | 21.8M | +129% | 13.2M | 16.5M | +25% |
+After observing that both k6 load generators were scheduled on the same client node (competing for CPU/memory), we added resource requests/limits to k6 runners to force them onto separate nodes. This ensures the load generators themselves don't become a bottleneck.
+
+**Infrastructure:**
+- Base image: `debian:bookworm-slim` (glibc)
+- App nodes: cpx42 (16 vCPUs, 32GB RAM)
+- CPU limit per server: 14 cores
+- Memory limit per server: 28Gi
+- k6 runners: 6 CPU request / 7 CPU limit, 12Gi request / 14Gi limit (each on separate node)
+
+#### Latency (successful requests only)
+
+| Metric | Go Server | Rust Server |
+|--------|-----------|-------------|
+| P50    | 0.255 ms  | 0.203 ms    |
+| P90    | 0.598 ms  | 0.618 ms    |
+| P95    | 0.805 ms  | 1.028 ms    |
+| P99    | 1.230 ms  | 2.286 ms    |
+| Avg    | 0.313 ms  | 0.326 ms    |
+
+#### Request Statistics
+
+| Server | Successful   | Failed | Error Rate |
+|--------|--------------|--------|------------|
+| Go     | 28,553,983   | 0      | 0%         |
+| Rust   | 28,781,423   | 516    | 0.0018%    |
+
+#### Resource Usage (during sustained load)
+
+| Resource | Go Server | Rust Server |
+|----------|-----------|-------------|
+| CPU (avg) | 2.08 cores | 2.44 cores |
+| CPU (peak) | 3.78 cores | 5.24 cores |
+| Memory (peak) | 521 MB | 224 MB |
+
+#### Key Observations
+
+1. **Rust wins at P50** for the first time (0.203ms vs 0.255ms) - 20% faster median latency
+2. **Go still dominates tail latency** - P99 is 1.23ms vs 2.29ms (46% lower)
+3. **Throughput is nearly identical** - 28.5M vs 28.8M requests (~1% difference)
+4. **Rust uses 57% less memory** (224MB vs 521MB) but 17% more CPU on average
+5. **Go had zero failures** again; Rust had 516 timeouts (still negligible at 0.002%)
+6. **Both servers improved** ~31% throughput vs iteration 2 thanks to dedicated k6 client nodes eliminating load generator bottleneck
+
+---
+
+### Comparison Across Iterations
+
+| Metric | Go (Iter 1) | Go (Iter 2) | Go (Iter 3) | Rust (Iter 1) | Rust (Iter 2) | Rust (Iter 3) |
+|--------|-------------|-------------|-------------|---------------|---------------|---------------|
+| P50    | 0.274 ms    | 0.256 ms    | 0.255 ms    | 0.338 ms      | 0.376 ms      | 0.203 ms      |
+| P99    | 3.979 ms    | 1.368 ms    | 1.230 ms    | 2.858 ms      | 1.874 ms      | 2.286 ms      |
+| Total Requests | 9.5M | 21.8M | 28.6M | 13.2M | 16.5M | 28.8M |
+| Failures | 653 | 0 | 0 | 323 | 23 | 516 |
+| Avg CPU | N/A | N/A | 2.08 cores | N/A | N/A | 2.44 cores |
+| Peak Memory | N/A | N/A | 521 MB | N/A | N/A | 224 MB |
 
 #### Summary
 
-- **Go benefited more** from the glibc switch and increased resources, with throughput increasing 129%
-- **Rust's P50 latency slightly increased** with glibc, but P99 improved significantly
-- **Go consistently outperforms Rust** in latency across both configurations
-- **The musl malloc issue** affects both languages, but Go's performance gains were more dramatic
+- **Iteration 1 (musl)**: Rust had higher throughput but Go had lower latency
+- **Iteration 2 (glibc + more resources)**: Go pulled ahead in both throughput and latency
+- **Iteration 3 (dedicated client nodes)**: Throughput equalized (~28.5M each), Rust won P50 for the first time (0.203ms), but Go still dominates tail latency (P99)
+- **Consistent findings**: Go uses more memory but less CPU; Rust has better memory efficiency (57% less in iteration 3)
+- **Load generator isolation matters**: Throughput jumped ~31% for both servers simply by giving k6 runners dedicated nodes
 
 ## Prerequisites
 
