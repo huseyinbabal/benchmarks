@@ -1,11 +1,16 @@
-FROM maven:3.9.6-eclipse-temurin-21 AS builder
+FROM eclipse-temurin:25-jdk AS builder
 
 WORKDIR /app
-COPY pom.xml .
-COPY src ./src
-RUN mvn clean package -DskipTests
 
-FROM eclipse-temurin:21-jre-alpine
+COPY pom.xml .
+COPY .mvn .mvn
+COPY mvnw .
+COPY src ./src
+
+RUN apt-get update && apt-get install -y maven && \
+    mvn clean package -DskipTests
+
+FROM eclipse-temurin:25-jre
 
 WORKDIR /app
 COPY --from=builder /app/target/*.jar app.jar
