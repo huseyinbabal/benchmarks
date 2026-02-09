@@ -26,6 +26,7 @@ prometheus:
         target_label: __address__
         replacement: ${1}:2112
     - job_name: 'springboot-server'
+      metrics_path: /actuator/prometheus
       kubernetes_sd_configs:
       - role: pod
         namespaces:

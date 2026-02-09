@@ -16,7 +16,7 @@ export const options = {
 
 export default function () {
   const res = http.get(
-    "http://fiber-server.fiber-vs-springboot.svc.cluster.local:8080/hash",
+    "http://fiber-server.fiber-vs-springboot.svc.cluster.local:3000/hash",
   );
 
   check(res, {

@@ -117,11 +117,32 @@ Open [http://localhost:3000](http://localhost:3000) and log in:
 
 Navigate to the **"Fiber vs Spring Boot Benchmark"** dashboard.
 
+**Note:** Use the **"Run"** dropdown at the top of the dashboard to filter results by specific benchmark runs.
+
 ### 2. Start the Load Tests
+
+**Option A: Using the run-benchmark.sh script (Recommended)**
+
+This script automatically generates a unique run ID and applies the test runs:
+
+```bash
+./run-benchmark.sh --run-id iteration-1
+```
+
+Or let it auto-generate a timestamp-based ID:
+
+```bash
+./run-benchmark.sh
+# Output: Running Benchmark: run-20260209-143052
+```
+
+**Option B: Manual run with kubectl**
 
 ```bash
 kubectl apply -f k6/testruns.yaml
 ```
+
+Note: Manual runs will use the default "latest" tag, making it harder to distinguish between different benchmark runs.
 
 ### 3. Monitor Progress
 
@@ -140,6 +161,7 @@ kubectl get pods -n fiber-vs-springboot -w
 ```
 .
 ├── setup.sh                     # Main setup script
+├── run-benchmark.sh             # Run benchmarks with unique run ID
 ├── kind-config.yaml             # Kind cluster configuration
 ├── monitoring-values.yaml       # Prometheus/Grafana Helm values
 ├── k6-values.yaml               # k6-operator Helm values
@@ -226,6 +248,42 @@ The pre-configured dashboard displays:
 - **Memory Usage** - Per-server memory consumption
 - **CPU Usage** - Per-server CPU consumption
 - **Total Requests (24h)** - Request counts per server
+
+## Run ID Management
+
+Each benchmark run can be tagged with a unique **Run ID** to help distinguish between different test iterations. This is especially useful when:
+
+- Running multiple benchmark iterations with different configurations
+- Testing different code versions (e.g., PRs)
+- Comparing performance before/after optimizations
+
+### Using Run IDs
+
+The `run-benchmark.sh` script manages run IDs automatically:
+
+```bash
+# Auto-generate a timestamp-based run ID
+./run-benchmark.sh
+# Creates: run-20260209-143052
+
+# Use a custom run ID for easy identification
+./run-benchmark.sh --run-id iteration-1
+./run-benchmark.sh --run-id pr-123-test
+./run-benchmark.sh --run-id baseline-fiber-v3
+```
+
+### Viewing Run Results in Grafana
+
+1. Open the Grafana dashboard
+2. Look for the **"Run"** dropdown at the top of the dashboard
+3. Select a specific run ID to view its results, or select "All" to compare multiple runs
+4. The dropdown automatically populates with all available run IDs from your benchmark history
+
+### Run ID Best Practices
+
+- **Descriptive names**: Use meaningful names like `iteration-1`, `pr-42`, `baseline` instead of random strings
+- **Consistency**: Use a naming convention (e.g., `iteration-N`, `pr-N-description`)
+- **Documentation**: Keep a log of what each run ID represents for future reference
 
 ## Customization
 
