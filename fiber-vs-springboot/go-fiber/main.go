@@ -23,10 +23,11 @@ func main() {
 	// Start Prometheus metrics server on port 2112
 	// The default Go collector automatically exports go_goroutines
 	go func() {
-		http.Handle("/metrics", promhttp.Handler())
+		mux := http.NewServeMux()
+		mux.Handle("/metrics", promhttp.Handler())
 		fmt.Println("Prometheus metrics server starting on :2112")
-		if err := http.ListenAndServe(":2112", nil); err != nil {
-			panic(err)
+		if err := http.ListenAndServe(":2112", mux); err != nil {
+			fmt.Printf("Prometheus metrics server failed: %v\n", err)
 		}
 	}()
 

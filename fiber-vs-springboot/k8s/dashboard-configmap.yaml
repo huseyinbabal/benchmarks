@@ -116,7 +116,7 @@ data:
           },
           "targets": [
             { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "go_goroutines{job=\"fiber-server\"}", "legendFormat": "Fiber Goroutines", "range": true, "refId": "A" },
-            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "sum(jvm_threads_virtual_live{job=\"springboot-server\"})", "legendFormat": "Spring Boot Virtual Threads", "range": true, "refId": "B" }
+            { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "sum(jvm_threads_virtual_live_threads{job=\"springboot-server\"})", "legendFormat": "Spring Boot Virtual Threads", "range": true, "refId": "B" }
           ],
           "title": "Goroutines / Threads Count",
           "type": "timeseries"
