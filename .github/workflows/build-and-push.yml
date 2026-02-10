@@ -18,8 +18,15 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        folder: [rust-server-vs-goserver]
-        app: [go-server, rust-server]
+        include:
+          - folder: rust-server-vs-goserver
+            app: go-server
+          - folder: rust-server-vs-goserver
+            app: rust-server
+          - folder: fiber-vs-springboot
+            app: go-fiber
+          - folder: fiber-vs-springboot
+            app: java-springboot
     permissions:
       contents: read
       packages: write

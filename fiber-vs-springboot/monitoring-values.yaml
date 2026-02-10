@@ -1,0 +1,65 @@
+# Monitoring values for Kind cluster
+# All monitoring components run on the monitoring-pool node
+
+prometheusOperator:
+  nodeSelector:
+    pool: monitoring-pool
+
+prometheus:
+  prometheusSpec:
+    enableRemoteWriteReceiver: true
+    nodeSelector:
+      pool: monitoring-pool
+    additionalScrapeConfigs:
+    - job_name: 'fiber-server'
+      kubernetes_sd_configs:
+      - role: pod
+        namespaces:
+          names:
+          - fiber-vs-springboot
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_label_app]
+        action: keep
+        regex: fiber-server
+      - source_labels: [__meta_kubernetes_pod_ip]
+        action: replace
+        target_label: __address__
+        replacement: ${1}:2112
+    - job_name: 'springboot-server'
+      metrics_path: /actuator/prometheus
+      kubernetes_sd_configs:
+      - role: pod
+        namespaces:
+          names:
+          - fiber-vs-springboot
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_label_app]
+        action: keep
+        regex: springboot-server
+      - source_labels: [__meta_kubernetes_pod_ip]
+        action: replace
+        target_label: __address__
+        replacement: ${1}:8080
+
+alertmanager:
+  alertmanagerSpec:
+    nodeSelector:
+      pool: monitoring-pool
+
+grafana:
+  nodeSelector:
+    pool: monitoring-pool
+  # Import custom dashboard from ConfigMap
+  sidecar:
+    dashboards:
+      enabled: true
+      searchNamespace: ALL
+
+kubeStateMetrics:
+  nodeSelector:
+    pool: monitoring-pool
+
+nodeExporter:
+  # Node exporter needs to run on all nodes to collect metrics
+  tolerations:
+    - operator: Exists

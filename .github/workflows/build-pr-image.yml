@@ -14,7 +14,11 @@ on:
         options:
           - go-server
           - rust-server
-          - both
+          - go-fiber
+          - java-springboot
+          - all-rust-go
+          - all-fiber-springboot
+          - all
 
 concurrency:
   group: pr-build-${{ github.event.inputs.pr_number }}
@@ -45,7 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        app: ${{ fromJSON(inputs.app == 'both' && '["go-server","rust-server"]' || format('["{0}"]', inputs.app)) }}
+        include: ${{ fromJSON(inputs.app == 'all' && '[{"app":"go-server","folder":"rust-server-vs-goserver"},{"app":"rust-server","folder":"rust-server-vs-goserver"},{"app":"go-fiber","folder":"fiber-vs-springboot"},{"app":"java-springboot","folder":"fiber-vs-springboot"}]' || inputs.app == 'all-rust-go' && '[{"app":"go-server","folder":"rust-server-vs-goserver"},{"app":"rust-server","folder":"rust-server-vs-goserver"}]' || inputs.app == 'all-fiber-springboot' && '[{"app":"go-fiber","folder":"fiber-vs-springboot"},{"app":"java-springboot","folder":"fiber-vs-springboot"}]' || inputs.app == 'go-server' && '[{"app":"go-server","folder":"rust-server-vs-goserver"}]' || inputs.app == 'rust-server' && '[{"app":"rust-server","folder":"rust-server-vs-goserver"}]' || inputs.app == 'go-fiber' && '[{"app":"go-fiber","folder":"fiber-vs-springboot"}]' || inputs.app == 'java-springboot' && '[{"app":"java-springboot","folder":"fiber-vs-springboot"}]' || '[]') }}
     permissions:
       contents: read
       packages: write
@@ -70,7 +74,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
-          context: rust-server-vs-goserver/${{ matrix.app }}
+          context: ${{ matrix.folder }}/${{ matrix.app }}
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.app }}:pr-${{ inputs.pr_number }}

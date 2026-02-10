@@ -1,0 +1,67 @@
+
+---
+cluster_name: fiber-vs-springboot
+kubeconfig_path: "./kubeconfig"
+k3s_version: v1.35.0+k3s1
+
+networking:
+  ssh:
+    port: 22
+    use_agent: false # set to true if your key has a passphrase
+    public_key_path: "~/.ssh/id_rsa.pub"
+    private_key_path: "~/.ssh/id_rsa"
+  allowed_networks:
+    ssh:
+      - 0.0.0.0/0
+    api: # this will firewall port 6443 on the nodes
+      - 0.0.0.0/0
+  public_network:
+    ipv4: true
+    ipv6: true
+  private_network:
+    enabled: true
+    subnet: 10.0.0.0/24
+    existing_network_name: ""
+  cni:
+    enabled: true
+    encryption: false
+    mode: flannel
+
+datastore:
+  mode: etcd # etcd (default) or external
+
+schedule_workloads_on_masters: false
+
+masters_pool:
+  instance_type: cpx22
+  instance_count: 1
+  locations:
+    - hel1
+
+worker_node_pools:
+  - name: app-pool
+    instance_type: cpx42
+    instance_count: 2
+    location: nbg1
+    labels:
+      - key: pool
+        value: app-pool
+  - name: monitoring-pool
+    instance_type: cpx32
+    instance_count: 1
+    location: nbg1
+    labels:
+      - key: pool
+        value: monitoring-pool
+  - name: client-pool
+    instance_type: cpx42
+    instance_count: 2
+    location: nbg1
+    labels:
+      - key: pool
+        value: client-pool
+
+embedded_registry_mirror:
+  enabled: false
+
+protect_against_deletion: false

@@ -1,0 +1,107 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fiber-server
+  namespace: fiber-vs-springboot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fiber-server
+  template:
+    metadata:
+      labels:
+        app: fiber-server
+    spec:
+      nodeSelector:
+        pool: app-pool
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - springboot-server
+            topologyKey: "kubernetes.io/hostname"
+      containers:
+      - name: fiber-server
+        image: ghcr.io/huseyinbabal/benchmarks/go-fiber:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+        - containerPort: 2112
+        resources:
+          requests:
+            cpu: "1"
+            memory: "512Mi"
+          limits:
+            cpu: "14"
+            memory: "28Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fiber-server
+  namespace: fiber-vs-springboot
+spec:
+  selector:
+    app: fiber-server
+  ports:
+  - port: 3000
+    targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot-server
+  namespace: fiber-vs-springboot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: springboot-server
+  template:
+    metadata:
+      labels:
+        app: springboot-server
+    spec:
+      nodeSelector:
+        pool: app-pool
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - fiber-server
+            topologyKey: "kubernetes.io/hostname"
+      containers:
+      - name: springboot-server
+        image: ghcr.io/huseyinbabal/benchmarks/java-springboot:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: "1"
+            memory: "512Mi"
+          limits:
+            cpu: "14"
+            memory: "28Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: springboot-server
+  namespace: fiber-vs-springboot
+spec:
+  selector:
+    app: springboot-server
+  ports:
+  - port: 8080
+    targetPort: 8080

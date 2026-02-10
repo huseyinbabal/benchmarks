@@ -15,7 +15,7 @@ use tokio::net::TcpListener;
 struct HashResponse {
     hash: String,
     timestamp: u128,
-    source: String,
+    source: &'static str,
 }
 
 #[tokio::main]
@@ -71,7 +71,7 @@ fn hash_handler() -> Response<Full<Bytes>> {
             .duration_since(UNIX_EPOCH)
             .unwrap()
             .as_millis(),
-        source: "rust".to_string(),
+        source: "rust",
     };
 
     let json = serde_json::to_string(&response).unwrap();

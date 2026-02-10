@@ -1,0 +1,76 @@
+---
+apiVersion: k6.io/v1alpha1
+kind: TestRun
+metadata:
+  name: k6-fiber
+  namespace: fiber-vs-springboot
+  labels:
+    target: fiber-server
+spec:
+  parallelism: 1
+  paused: "false"
+  quiet: "false"
+  script:
+    configMap:
+      name: k6-test-fiber
+      file: test.js
+  cleanup: post
+  arguments: --out experimental-prometheus-rw --tag testid=fiber --tag lang=fiber --tag run=latest
+  runner:
+    nodeSelector:
+      pool: client-pool
+    image: grafana/k6:latest
+    resources:
+      requests:
+        cpu: "6"
+        memory: "12Gi"
+      limits:
+        cpu: "7"
+        memory: "14Gi"
+    env:
+    - name: RUN_ID
+      value: "latest"
+    - name: K6_PROMETHEUS_RW_SERVER_URL
+      value: "http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090/api/v1/write"
+    - name: K6_PROMETHEUS_RW_TREND_AS_NATIVE_HISTOGRAM
+      value: "false"
+    - name: K6_PROMETHEUS_RW_TREND_STATS
+      value: "p(50),p(90),p(95),p(99),avg"
+---
+apiVersion: k6.io/v1alpha1
+kind: TestRun
+metadata:
+  name: k6-springboot
+  namespace: fiber-vs-springboot
+  labels:
+    target: springboot-server
+spec:
+  parallelism: 1
+  paused: "false"
+  quiet: "false"
+  script:
+    configMap:
+      name: k6-test-springboot
+      file: test.js
+  cleanup: post
+  arguments: --out experimental-prometheus-rw --tag testid=springboot --tag lang=springboot --tag run=latest
+  runner:
+    nodeSelector:
+      pool: client-pool
+    image: grafana/k6:latest
+    resources:
+      requests:
+        cpu: "6"
+        memory: "12Gi"
+      limits:
+        cpu: "7"
+        memory: "14Gi"
+    env:
+    - name: RUN_ID
+      value: "latest"
+    - name: K6_PROMETHEUS_RW_SERVER_URL
+      value: "http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090/api/v1/write"
+    - name: K6_PROMETHEUS_RW_TREND_AS_NATIVE_HISTOGRAM
+      value: "false"
+    - name: K6_PROMETHEUS_RW_TREND_STATS
+      value: "p(50),p(90),p(95),p(99),avg"
